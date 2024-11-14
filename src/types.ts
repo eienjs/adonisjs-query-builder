@@ -7,6 +7,10 @@ export interface Filter<Model extends LucidModel, Result = InstanceType<Model>> 
   _invoke(query: ModelQueryBuilderContract<Model, Result>, value: StrictValuesWithoutRaw, property: string): void;
 }
 
+export interface Include<Model extends LucidModel, Result = InstanceType<Model>> {
+  _invoke(query: ModelQueryBuilderContract<Model, Result>, include: string): void;
+}
+
 export interface Sort<Model extends LucidModel, Result = InstanceType<Model>> {
   _invoke(query: ModelQueryBuilderContract<Model, Result>, descending: boolean, property: string): void;
 }
