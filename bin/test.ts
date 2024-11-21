@@ -1,3 +1,4 @@
+import process from 'node:process';
 import { assert } from '@japa/assert';
 import { configure, processCLIArgs, run } from '@japa/runner';
 
