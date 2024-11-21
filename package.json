@@ -52,6 +52,9 @@
     "typedoc": "^0.26.11",
     "typescript": "^5.6.3"
   },
+  "dependencies": {
+    "collect.js": "^4.36.1"
+  },
   "peerDependencies": {
     "@adonisjs/core": "^6.14.1",
     "@adonisjs/lucid": "^21.4.0"
@@ -123,8 +126,5 @@
     "exports": {
       ".": "./src/index.ts"
     }
-  },
-  "dependencies": {
-    "collect.js": "^4.36.1"
   }
 }
