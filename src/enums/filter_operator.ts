@@ -1,4 +1,4 @@
-import { type EnumValues } from '../types.js';
+import { type EnumValues } from '../types/main.js';
 
 export const FilterOperator = {
   Dynamic: '',

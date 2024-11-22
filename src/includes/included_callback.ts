@@ -1,6 +1,6 @@
 import { type LucidModel, type ModelQueryBuilderContract } from '@adonisjs/lucid/types/model';
 import { type ExtractModelRelations } from '@adonisjs/lucid/types/relations';
-import { type Include } from '../types.js';
+import { type Include } from '../types/main.js';
 
 export default class IncludeCallback<Model extends LucidModel, Result = InstanceType<Model>>
   implements Include<Model, Result>
