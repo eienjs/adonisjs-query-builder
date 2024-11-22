@@ -16,25 +16,13 @@ export default class QueryBuilderRequest {
 
   private constructor(private readonly _request: Request) {}
 
-  public static setArrayValueDelimiter(delimiter: string): void {
-    QueryBuilderRequest.filterArrayValueDelimiter = delimiter;
-    QueryBuilderRequest.includesArrayValueDelimiter = delimiter;
-    QueryBuilderRequest.appendsArrayValueDelimiter = delimiter;
-    QueryBuilderRequest.fieldsArrayValueDelimiter = delimiter;
-    QueryBuilderRequest.sortsArrayValueDelimiter = delimiter;
-  }
-
-  public static fromRequest(request: Request): QueryBuilderRequest {
-    return new QueryBuilderRequest(request);
-  }
-
   public includes(): Collection<unknown> {
     const includeParameterName = app.config.get<string>('querybuilder.parameters.include', 'include');
 
     let includeParts = this.getRequestData(includeParameterName, {});
 
     if (typeof includeParts === 'string') {
-      includeParts = includeParts.split(QueryBuilderRequest.includesArrayValueDelimiter);
+      includeParts = includeParts.split(QueryBuilderRequest.getIncludesArrayValueDelimiter());
     }
 
     return new Collection(includeParts).filter();
@@ -46,7 +34,7 @@ export default class QueryBuilderRequest {
     let appendParts = this.getRequestData(appendParameterName, {});
 
     if (typeof appendParts === 'string') {
-      appendParts = appendParts.split(QueryBuilderRequest.appendsArrayValueDelimiter);
+      appendParts = appendParts.split(QueryBuilderRequest.getAppendsArrayValueDelimiter());
     }
 
     return new Collection(appendParts).filter();
@@ -56,7 +44,9 @@ export default class QueryBuilderRequest {
     const fieldsParameterName = app.config.get<string>('querybuilder.parameters.fields', 'fields');
     const fieldsData = this.getRequestData(fieldsParameterName, {});
     const fieldsPerTable = new Collection(
-      typeof fieldsData === 'string' ? fieldsData.split(QueryBuilderRequest.fieldsArrayValueDelimiter) : fieldsData,
+      typeof fieldsData === 'string'
+        ? fieldsData.split(QueryBuilderRequest.getFieldsArrayValueDelimiter())
+        : fieldsData,
     );
 
     if (fieldsPerTable.isEmpty()) {
@@ -74,7 +64,7 @@ export default class QueryBuilderRequest {
       }
 
       if (typeof tableFields === 'string') {
-        tableFields = tableFields.split(QueryBuilderRequest.fieldsArrayValueDelimiter).map((field) => {
+        tableFields = tableFields.split(QueryBuilderRequest.getFieldsArrayValueDelimiter()).map((field) => {
           return strAfterLast(field, '.');
         });
       }
@@ -91,7 +81,7 @@ export default class QueryBuilderRequest {
     let sortParts = this.getRequestData(sortParameterName, {});
 
     if (typeof sortParts === 'string') {
-      sortParts = sortParts.split(QueryBuilderRequest.sortsArrayValueDelimiter);
+      sortParts = sortParts.split(QueryBuilderRequest.getSortsArrayValueDelimiter());
     }
 
     return new Collection(sortParts).filter();
@@ -130,8 +120,8 @@ export default class QueryBuilderRequest {
         .all();
     }
 
-    if (typeof value === 'string' && value.includes(QueryBuilderRequest.filterArrayValueDelimiter)) {
-      return value.split(QueryBuilderRequest.filterArrayValueDelimiter);
+    if (typeof value === 'string' && value.includes(QueryBuilderRequest.getFilterArrayValueDelimiter())) {
+      return value.split(QueryBuilderRequest.getFilterArrayValueDelimiter());
     }
 
     if (value === 'true') {
@@ -147,5 +137,65 @@ export default class QueryBuilderRequest {
 
   protected getRequestData<T = unknown>(key: string, defaultValue?: T): T {
     return this._request.input(key, defaultValue) as T;
+  }
+
+  public static setArrayValueDelimiter(delimiter: string): void {
+    QueryBuilderRequest.filterArrayValueDelimiter = delimiter;
+    QueryBuilderRequest.includesArrayValueDelimiter = delimiter;
+    QueryBuilderRequest.appendsArrayValueDelimiter = delimiter;
+    QueryBuilderRequest.fieldsArrayValueDelimiter = delimiter;
+    QueryBuilderRequest.sortsArrayValueDelimiter = delimiter;
+  }
+
+  public static fromRequest(request: Request): QueryBuilderRequest {
+    return new QueryBuilderRequest(request);
+  }
+
+  public static setIncludesArrayValueDelimiter(includesArrayValueDelimiter: string): void {
+    QueryBuilderRequest.includesArrayValueDelimiter = includesArrayValueDelimiter;
+  }
+
+  public static setAppendsArrayValueDelimiter(appendsArrayValueDelimiter: string): void {
+    QueryBuilderRequest.appendsArrayValueDelimiter = appendsArrayValueDelimiter;
+  }
+
+  public static setFieldsArrayValueDelimiter(fieldsArrayValueDelimiter: string): void {
+    QueryBuilderRequest.fieldsArrayValueDelimiter = fieldsArrayValueDelimiter;
+  }
+
+  public static setSortsArrayValueDelimiter(sortsArrayValueDelimiter: string): void {
+    QueryBuilderRequest.sortsArrayValueDelimiter = sortsArrayValueDelimiter;
+  }
+
+  public static setFilterArrayValueDelimiter(filterArrayValueDelimiter: string): void {
+    QueryBuilderRequest.filterArrayValueDelimiter = filterArrayValueDelimiter;
+  }
+
+  public static getIncludesArrayValueDelimiter(): string {
+    return QueryBuilderRequest.includesArrayValueDelimiter;
+  }
+
+  public static getAppendsArrayValueDelimiter(): string {
+    return QueryBuilderRequest.appendsArrayValueDelimiter;
+  }
+
+  public static getFieldsArrayValueDelimiter(): string {
+    return QueryBuilderRequest.fieldsArrayValueDelimiter;
+  }
+
+  public static getSortsArrayValueDelimiter(): string {
+    return QueryBuilderRequest.sortsArrayValueDelimiter;
+  }
+
+  public static getFilterArrayValueDelimiter(): string {
+    return QueryBuilderRequest.filterArrayValueDelimiter;
+  }
+
+  public static resetDelimiters(): void {
+    QueryBuilderRequest.includesArrayValueDelimiter = ',';
+    QueryBuilderRequest.appendsArrayValueDelimiter = ',';
+    QueryBuilderRequest.fieldsArrayValueDelimiter = ',';
+    QueryBuilderRequest.sortsArrayValueDelimiter = ',';
+    QueryBuilderRequest.filterArrayValueDelimiter = ',';
   }
 }

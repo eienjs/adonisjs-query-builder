@@ -1,7 +1,7 @@
 import { type LucidModel, type ModelQueryBuilderContract } from '@adonisjs/lucid/types/model';
 import { type StrictValuesWithoutRaw } from '@adonisjs/lucid/types/querybuilder';
 import { type ExtractModelRelations } from '@adonisjs/lucid/types/relations';
-import { type Filter } from '../types.js';
+import { type Filter } from '../types/main.js';
 
 export default class FiltersExact<Model extends LucidModel, Result = InstanceType<Model>>
   implements Filter<Model, Result>
@@ -12,7 +12,7 @@ export default class FiltersExact<Model extends LucidModel, Result = InstanceTyp
 
   public _invoke(
     query: ModelQueryBuilderContract<Model, Result>,
-    value: StrictValuesWithoutRaw,
+    value: StrictValuesWithoutRaw | null,
     property: string,
   ): void {
     if (this.$addRelationConstraint && this.isRelationProperty(query, property)) {
@@ -23,6 +23,12 @@ export default class FiltersExact<Model extends LucidModel, Result = InstanceTyp
 
     if (Array.isArray(value)) {
       void query.whereIn(query.qualifyColumn(property), value);
+
+      return;
+    }
+
+    if (value === null) {
+      void query.whereNull(query.qualifyColumn(property));
 
       return;
     }
@@ -46,7 +52,7 @@ export default class FiltersExact<Model extends LucidModel, Result = InstanceTyp
 
   protected withRelationConstraint(
     query: ModelQueryBuilderContract<Model, Result>,
-    value: StrictValuesWithoutRaw,
+    value: StrictValuesWithoutRaw | null,
     property: string,
   ): void {
     const parts = property.split('.');

@@ -1,6 +1,6 @@
 import { type LucidModel, type ModelQueryBuilderContract } from '@adonisjs/lucid/types/model';
 import { type StrictValuesWithoutRaw } from '@adonisjs/lucid/types/querybuilder';
-import { type Filter } from '../types.js';
+import { type Filter } from '../types/main.js';
 import FiltersExact from './filters_exact.js';
 
 export default class FiltersPartial<Model extends LucidModel, Result = InstanceType<Model>>
@@ -9,7 +9,7 @@ export default class FiltersPartial<Model extends LucidModel, Result = InstanceT
 {
   public _invoke(
     query: ModelQueryBuilderContract<Model, Result>,
-    value: StrictValuesWithoutRaw,
+    value: StrictValuesWithoutRaw | null,
     property: string,
   ): void {
     if (this.$addRelationConstraint && this.isRelationProperty(query, property)) {
@@ -41,7 +41,7 @@ export default class FiltersPartial<Model extends LucidModel, Result = InstanceT
     void method(wrappedProperty, expresion);
   }
 
-  protected getWhereParameters(value: StrictValuesWithoutRaw): [boolean, string] {
+  protected getWhereParameters(value: StrictValuesWithoutRaw | null): [boolean, string] {
     return [false, `%${value}%`];
   }
 }

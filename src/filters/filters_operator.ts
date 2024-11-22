@@ -1,7 +1,7 @@
 import { type LucidModel, type ModelQueryBuilderContract } from '@adonisjs/lucid/types/model';
 import { type StrictValuesWithoutRaw } from '@adonisjs/lucid/types/querybuilder';
 import { type EFilterOperator, FilterOperator } from '../enums/filter_operator.js';
-import { type Filter } from '../types.js';
+import { type Filter } from '../types/main.js';
 import { substrReplace } from '../utils/helpers.js';
 import FiltersExact from './filters_exact.js';
 
@@ -18,7 +18,7 @@ export default class FiltersOperator<Model extends LucidModel, Result = Instance
 
   public _invoke(
     query: ModelQueryBuilderContract<Model, Result>,
-    value: StrictValuesWithoutRaw,
+    value: StrictValuesWithoutRaw | null,
     property: string,
   ): void {
     let filterOperator = this.$filterOperator;
@@ -38,7 +38,7 @@ export default class FiltersOperator<Model extends LucidModel, Result = Instance
       return;
     }
 
-    let copyValue = value;
+    let copyValue = value ?? '';
     if (this.$filterOperator === FilterOperator.Dynamic) {
       filterOperator = this.getDynamicFilterOperator(copyValue.toString());
       copyValue = this.removeDynamicFilterOperatorFromValue(copyValue.toString(), filterOperator);

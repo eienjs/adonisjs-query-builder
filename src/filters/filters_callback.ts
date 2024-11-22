@@ -1,6 +1,6 @@
 import { type LucidModel, type ModelQueryBuilderContract } from '@adonisjs/lucid/types/model';
 import { type StrictValuesWithoutRaw } from '@adonisjs/lucid/types/querybuilder';
-import { type Filter } from '../types.js';
+import { type Filter } from '../types/main.js';
 
 export default class FiltersCallback<Model extends LucidModel, Result = InstanceType<Model>>
   implements Filter<Model, Result>
@@ -8,14 +8,14 @@ export default class FiltersCallback<Model extends LucidModel, Result = Instance
   public constructor(
     private readonly callback: (
       query: ModelQueryBuilderContract<Model, Result>,
-      value: StrictValuesWithoutRaw,
+      value: StrictValuesWithoutRaw | null,
       property: string,
     ) => void,
   ) {}
 
   public _invoke(
     query: ModelQueryBuilderContract<Model, Result>,
-    value: StrictValuesWithoutRaw,
+    value: StrictValuesWithoutRaw | null,
     property: string,
   ): void {
     this.callback(query, value, property);
