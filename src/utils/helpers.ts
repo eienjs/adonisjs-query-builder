@@ -15,3 +15,31 @@ export const substrReplace = (str: string, replace: string, start: number, lengt
     str.slice(start + length),
   ].join('');
 };
+
+export const strBeforeLast = (subject: string, search: string): string => {
+  if (search === '') {
+    return subject;
+  }
+
+  const pos = subject.lastIndexOf(search);
+
+  if (pos === -1) {
+    return subject;
+  }
+
+  return subject.slice(0, Math.max(0, pos));
+};
+
+export const strAfterLast = (subject: string, search: string): string => {
+  if (search === '') {
+    return subject;
+  }
+
+  const pos = subject.lastIndexOf(search);
+
+  if (pos === -1) {
+    return subject;
+  }
+
+  return subject.slice(pos + search.length);
+};

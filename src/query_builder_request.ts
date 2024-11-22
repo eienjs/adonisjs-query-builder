@@ -1,6 +1,7 @@
 import { type Request } from '@adonisjs/core/http';
 import app from '@adonisjs/core/services/app';
 import { Collection } from 'collect.js';
+import { strAfterLast, strBeforeLast } from './utils/helpers.js';
 
 export default class QueryBuilderRequest {
   protected static includesArrayValueDelimiter = ',';
@@ -51,9 +52,37 @@ export default class QueryBuilderRequest {
     return new Collection(appendParts).filter();
   }
 
-  public fields(): unknown[] {
-    // TODO: handle correct return fields
-    return [];
+  public fields(): Collection<unknown> {
+    const fieldsParameterName = app.config.get<string>('querybuilder.parameters.fields', 'fields');
+    const fieldsData = this.getRequestData(fieldsParameterName, {});
+    const fieldsPerTable = new Collection(
+      typeof fieldsData === 'string' ? fieldsData.split(QueryBuilderRequest.fieldsArrayValueDelimiter) : fieldsData,
+    );
+
+    if (fieldsPerTable.isEmpty()) {
+      return new Collection();
+    }
+
+    const fields: Record<string, unknown> = {};
+    fieldsPerTable.each((tableFields, model) => {
+      if (!model || typeof model === 'number') {
+        model = typeof tableFields === 'string' && tableFields.includes('.') ? strBeforeLast(tableFields, '.') : '_';
+      }
+
+      if (!fields[model]) {
+        fields[model] = [];
+      }
+
+      if (typeof tableFields === 'string') {
+        tableFields = tableFields.split(QueryBuilderRequest.fieldsArrayValueDelimiter).map((field) => {
+          return strAfterLast(field, '.');
+        });
+      }
+
+      fields[model] = [...(fields[model] as string[]), ...(tableFields as string[])];
+    });
+
+    return new Collection(fields);
   }
 
   public sorts(): Collection<unknown> {

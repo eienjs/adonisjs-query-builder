@@ -283,10 +283,152 @@ test.group('QueryBuilderRequest', (group) => {
     assert.deepEqual(queryRequest.includes(), expected);
   });
 
-  test('will return an empty collection when no include whery params are specified', ({ assert }) => {
+  test('will return an empty collection when no include query params are specified', ({ assert }) => {
     const request = new RequestFactory().create();
     const queryRequest = QueryBuilderRequest.fromRequest(request);
 
     assert.isTrue(queryRequest.includes().isEmpty());
+  });
+
+  test('can get requested fields', ({ assert }) => {
+    const request = new RequestFactory().create();
+    request.updateQs({
+      fields: {
+        table: 'name,email',
+      },
+    });
+    const queryRequest = QueryBuilderRequest.fromRequest(request);
+
+    const expected = collect({ table: ['name', 'email'] });
+
+    assert.deepEqual(queryRequest.fields(), expected);
+  });
+
+  test('can get requested fields without a table name', ({ assert }) => {
+    const request = new RequestFactory().create();
+    request.updateQs({
+      fields: 'name,email,related.id,related.type',
+    });
+    const queryRequest = QueryBuilderRequest.fromRequest(request);
+
+    const expected = collect({ _: ['name', 'email'], related: ['id', 'type'] });
+
+    assert.deepEqual(queryRequest.fields(), expected);
+  });
+
+  test('can get nested fields', ({ assert }) => {
+    const request = new RequestFactory().create();
+    request.updateQs({
+      fields: {
+        'table': 'name,email',
+        'pivots': 'id,type',
+        'pivots.posts': 'content',
+      },
+    });
+    const queryRequest = QueryBuilderRequest.fromRequest(request);
+
+    const expected = collect({ 'table': ['name', 'email'], 'pivots': ['id', 'type'], 'pivots.posts': ['content'] });
+
+    assert.deepEqual(queryRequest.fields(), expected);
+  });
+
+  test('can get nested fields from a string fields request', ({ assert }) => {
+    const request = new RequestFactory().create();
+    request.updateQs({
+      fields: 'id,name,email,pivots.id,pivots.type,pivots.posts.content',
+    });
+    const queryRequest = QueryBuilderRequest.fromRequest(request);
+
+    const expected = collect({ '_': ['id', 'name', 'email'], 'pivots': ['id', 'type'], 'pivots.posts': ['content'] });
+
+    assert.deepEqual(queryRequest.fields(), expected);
+  });
+
+  test('can get requested fields from the request body', ({ assert }) => {
+    const request = new RequestFactory().create();
+    request.updateBody({
+      fields: {
+        table: 'name,email',
+      },
+    });
+    const queryRequest = QueryBuilderRequest.fromRequest(request);
+
+    const expected = collect({ table: ['name', 'email'] });
+
+    assert.deepEqual(queryRequest.fields(), expected);
+  });
+
+  test('can get different fields parameter name', ({ assert }) => {
+    app.config.set('querybuilder.parameters.fields', 'field');
+    const request = new RequestFactory().create();
+    request.updateQs({
+      field: {
+        table: 'name,email',
+      },
+    });
+    const queryRequest = QueryBuilderRequest.fromRequest(request);
+
+    const expected = collect({ table: ['name', 'email'] });
+
+    assert.deepEqual(queryRequest.fields(), expected);
+  });
+
+  test('can get the append query params from the request', ({ assert }) => {
+    const request = new RequestFactory().create();
+    request.updateQs({
+      append: 'foo,bar',
+    });
+    const queryRequest = QueryBuilderRequest.fromRequest(request);
+
+    const expected = collect(['foo', 'bar']);
+
+    assert.deepEqual(queryRequest.appends(), expected);
+  });
+
+  test('can get different append query parameter name', ({ assert }) => {
+    app.config.set('querybuilder.parameters.append', 'appendit');
+    const request = new RequestFactory().create();
+    request.updateQs({
+      appendit: 'foo,bar',
+    });
+    const queryRequest = QueryBuilderRequest.fromRequest(request);
+
+    const expected = collect(['foo', 'bar']);
+
+    assert.deepEqual(queryRequest.appends(), expected);
+  });
+
+  test('will return an empty collection when no append query params are specified', ({ assert }) => {
+    const request = new RequestFactory().create();
+    const queryRequest = QueryBuilderRequest.fromRequest(request);
+
+    assert.isTrue(queryRequest.appends().isEmpty());
+  });
+
+  test('can get the append query params from the request body', ({ assert }) => {
+    const request = new RequestFactory().create();
+    request.updateBody({
+      append: 'foo,bar',
+    });
+    const queryRequest = QueryBuilderRequest.fromRequest(request);
+
+    const expected = collect(['foo', 'bar']);
+
+    assert.deepEqual(queryRequest.appends(), expected);
+  });
+
+  test('takes custom delimiter for splitting request parameters', ({ assert }) => {
+    const request = new RequestFactory().create();
+    request.updateQs({
+      filter: {
+        foo: 'values, contain, commas|and are split on vertical| lines',
+      },
+    });
+    const queryRequest = QueryBuilderRequest.fromRequest(request);
+    QueryBuilderRequest.setArrayValueDelimiter('|');
+
+    assert.deepEqual(queryRequest.filters().all(), {
+      foo: ['values, contain, commas', 'and are split on vertical', ' lines'],
+    });
   });
 });
