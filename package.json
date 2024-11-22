@@ -102,7 +102,7 @@
   "c8": {
     "reporter": [
       "text",
-      "html"
+      "lcov"
     ],
     "exclude": [
       "tests/**"
