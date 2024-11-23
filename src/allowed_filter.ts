@@ -1,8 +1,14 @@
 import { type LucidModel, type ModelAttributes, type ModelQueryBuilderContract } from '@adonisjs/lucid/types/model';
 import { type StrictValuesWithoutRaw } from '@adonisjs/lucid/types/querybuilder';
 import { Collection } from 'collect.js';
+import { type EFilterOperator } from './enums/filter_operator.js';
+import FiltersBeginsWithStrict from './filters/filters_begins_with_strict.js';
+import FiltersCallback from './filters/filters_callback.js';
+import FiltersEndsWithStrict from './filters/filters_ends_with_strict.js';
 import FiltersExact from './filters/filters_exact.js';
+import FiltersOperator from './filters/filters_operator.js';
 import FiltersPartial from './filters/filters_partial.js';
+import FiltersTrashed from './filters/filters_trashed.js';
 import QueryBuilderRequest from './query_builder_request.js';
 import { type Filter } from './types/main.js';
 
@@ -122,9 +128,9 @@ export default class AllowedFilter<Model extends LucidModel> {
     addRelationConstraint = true,
     arrayValueDelimiter?: string,
   ): AllowedFilter<T> {
-    AllowedFilter.setFilterArrayValueDelimiter(arrayValueDelimiter);
+    this.setFilterArrayValueDelimiter(arrayValueDelimiter);
 
-    return new AllowedFilter(name, new FiltersExact(addRelationConstraint), internalName);
+    return new this(name, new FiltersExact(addRelationConstraint), internalName);
   }
 
   public static partial<T extends LucidModel>(
@@ -133,48 +139,71 @@ export default class AllowedFilter<Model extends LucidModel> {
     addRelationConstraint = true,
     arrayValueDelimiter?: string,
   ): AllowedFilter<T> {
-    AllowedFilter.setFilterArrayValueDelimiter(arrayValueDelimiter);
+    this.setFilterArrayValueDelimiter(arrayValueDelimiter);
 
-    return new AllowedFilter(name, new FiltersPartial(addRelationConstraint), internalName);
+    return new this(name, new FiltersPartial(addRelationConstraint), internalName);
   }
 
-  // public static beginsWithStrict(string $name, $internalName = null, bool $addRelationConstraint = true, string $arrayValueDelimiter = null): static
-  // {
-  //     static::setFilterArrayValueDelimiter($arrayValueDelimiter);
+  public static beginsWithStrict<T extends LucidModel>(
+    name: string | keyof ModelAttributes<InstanceType<T>>,
+    internalName?: keyof ModelAttributes<InstanceType<T>>,
+    addRelationConstraint = true,
+    arrayValueDelimiter?: string,
+  ): AllowedFilter<T> {
+    this.setFilterArrayValueDelimiter(arrayValueDelimiter);
 
-  //     return new static($name, new FiltersBeginsWithStrict($addRelationConstraint), $internalName);
-  // }
+    return new this(name, new FiltersBeginsWithStrict(addRelationConstraint), internalName);
+  }
 
-  // public static endsWithStrict(string $name, $internalName = null, bool $addRelationConstraint = true, string $arrayValueDelimiter = null): static
-  // {
-  //     static::setFilterArrayValueDelimiter($arrayValueDelimiter);
+  public static endsWithStrict<T extends LucidModel>(
+    name: string | keyof ModelAttributes<InstanceType<T>>,
+    internalName?: keyof ModelAttributes<InstanceType<T>>,
+    addRelationConstraint = true,
+    arrayValueDelimiter?: string,
+  ): AllowedFilter<T> {
+    this.setFilterArrayValueDelimiter(arrayValueDelimiter);
 
-  //     return new static($name, new FiltersEndsWithStrict($addRelationConstraint), $internalName);
-  // }
+    return new this(name, new FiltersEndsWithStrict(addRelationConstraint), internalName);
+  }
 
-  // public static callback(string $name, $callback, $internalName = null, string $arrayValueDelimiter = null): static
-  // {
-  //     static::setFilterArrayValueDelimiter($arrayValueDelimiter);
+  public static callback<T extends LucidModel>(
+    name: string,
+    callback: (query: ModelQueryBuilderContract<T>, value: StrictValuesWithoutRaw | null, property: string) => void,
+    internalName?: keyof ModelAttributes<InstanceType<T>>,
+    arrayValueDelimiter?: string,
+  ): AllowedFilter<T> {
+    this.setFilterArrayValueDelimiter(arrayValueDelimiter);
 
-  //     return new static($name, new FiltersCallback($callback), $internalName);
-  // }
+    return new this(name, new FiltersCallback(callback), internalName);
+  }
 
-  // public static trashed(string $name = 'trashed', $internalName = null): static
-  // {
-  //     return new static($name, new FiltersTrashed(), $internalName);
-  // }
+  public static trashed<T extends LucidModel>(
+    name = 'trashed',
+    internalName?: keyof ModelAttributes<InstanceType<T>>,
+  ): AllowedFilter<T> {
+    return new this(name, new FiltersTrashed(), internalName);
+  }
 
-  // public static custom(string $name, Filter $filterClass, $internalName = null, string $arrayValueDelimiter = null): static
-  // {
-  //     static::setFilterArrayValueDelimiter($arrayValueDelimiter);
+  public static custom<T extends LucidModel>(
+    name: string | keyof ModelAttributes<InstanceType<T>>,
+    filterClass: Filter<T>,
+    internalName?: keyof ModelAttributes<InstanceType<T>>,
+    arrayValueDelimiter?: string,
+  ): AllowedFilter<T> {
+    this.setFilterArrayValueDelimiter(arrayValueDelimiter);
 
-  //     return new static($name, $filterClass, $internalName);
-  // }
+    return new this(name, filterClass, internalName);
+  }
 
-  // public static operator(string $name, FilterOperator $filterOperator, string $boolean = 'and', ?string $internalName = null, bool $addRelationConstraint = true, string $arrayValueDelimiter = null): self
-  // {
-  //     static::setFilterArrayValueDelimiter($arrayValueDelimiter);
+  public static operator<T extends LucidModel>(
+    name: string | keyof ModelAttributes<InstanceType<T>>,
+    filterOperator: EFilterOperator,
+    internalName?: keyof ModelAttributes<InstanceType<T>>,
+    addRelationConstraint = true,
+    arrayValueDelimiter?: string,
+  ): AllowedFilter<T> {
+    this.setFilterArrayValueDelimiter(arrayValueDelimiter);
 
-  //     return new static($name, new FiltersOperator($addRelationConstraint, $filterOperator, $boolean), $internalName, $filterOperator);
-  // }
+    return new this(name, new FiltersOperator(addRelationConstraint, filterOperator), internalName);
+  }
 }
