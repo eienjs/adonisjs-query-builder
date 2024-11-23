@@ -17,6 +17,7 @@
     "format:check": "prettier --check .",
     "test": "node --import=ts-node-maintained/register/esm --enable-source-maps bin/test.ts",
     "test:coverage": "c8 pnpm test",
+    "tools": "pnpm run lint:check && pnpm run format:check && pnpm run typecheck && pnpm run test",
     "gen:docs": "typedoc --options typedoc.json",
     "changelog": "auto-changelog -p && git add CHANGELOG.md",
     "prebuild": "pnpm lint:check && pnpm typecheck",
