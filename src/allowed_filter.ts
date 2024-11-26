@@ -30,7 +30,7 @@ export default class AllowedFilter<Model extends LucidModel> {
   public constructor(
     name: string | keyof ModelAttributes<InstanceType<Model>>,
     filterClass: Filter<Model>,
-    internalName?: keyof ModelAttributes<InstanceType<Model>>,
+    internalName?: string | keyof ModelAttributes<InstanceType<Model>>,
   ) {
     this.name = name as string;
     this.filterClass = filterClass;
@@ -124,7 +124,7 @@ export default class AllowedFilter<Model extends LucidModel> {
 
   public static exact<T extends LucidModel>(
     name: string | keyof ModelAttributes<InstanceType<T>>,
-    internalName?: keyof ModelAttributes<InstanceType<T>>,
+    internalName?: string | keyof ModelAttributes<InstanceType<T>>,
     addRelationConstraint = true,
     arrayValueDelimiter?: string,
   ): AllowedFilter<T> {
@@ -135,7 +135,7 @@ export default class AllowedFilter<Model extends LucidModel> {
 
   public static partial<T extends LucidModel>(
     name: string | keyof ModelAttributes<InstanceType<T>>,
-    internalName?: keyof ModelAttributes<InstanceType<T>>,
+    internalName?: string | keyof ModelAttributes<InstanceType<T>>,
     addRelationConstraint = true,
     arrayValueDelimiter?: string,
   ): AllowedFilter<T> {
@@ -146,7 +146,7 @@ export default class AllowedFilter<Model extends LucidModel> {
 
   public static beginsWithStrict<T extends LucidModel>(
     name: string | keyof ModelAttributes<InstanceType<T>>,
-    internalName?: keyof ModelAttributes<InstanceType<T>>,
+    internalName?: string | keyof ModelAttributes<InstanceType<T>>,
     addRelationConstraint = true,
     arrayValueDelimiter?: string,
   ): AllowedFilter<T> {
@@ -157,7 +157,7 @@ export default class AllowedFilter<Model extends LucidModel> {
 
   public static endsWithStrict<T extends LucidModel>(
     name: string | keyof ModelAttributes<InstanceType<T>>,
-    internalName?: keyof ModelAttributes<InstanceType<T>>,
+    internalName?: string | keyof ModelAttributes<InstanceType<T>>,
     addRelationConstraint = true,
     arrayValueDelimiter?: string,
   ): AllowedFilter<T> {
@@ -169,7 +169,7 @@ export default class AllowedFilter<Model extends LucidModel> {
   public static callback<T extends LucidModel>(
     name: string,
     callback: (query: ModelQueryBuilderContract<T>, value: StrictValuesWithoutRaw | null, property: string) => void,
-    internalName?: keyof ModelAttributes<InstanceType<T>>,
+    internalName?: string | keyof ModelAttributes<InstanceType<T>>,
     arrayValueDelimiter?: string,
   ): AllowedFilter<T> {
     this.setFilterArrayValueDelimiter(arrayValueDelimiter);
@@ -179,7 +179,7 @@ export default class AllowedFilter<Model extends LucidModel> {
 
   public static trashed<T extends LucidModel>(
     name = 'trashed',
-    internalName?: keyof ModelAttributes<InstanceType<T>>,
+    internalName?: string | keyof ModelAttributes<InstanceType<T>>,
   ): AllowedFilter<T> {
     return new this(name, new FiltersTrashed(), internalName);
   }
@@ -187,7 +187,7 @@ export default class AllowedFilter<Model extends LucidModel> {
   public static custom<T extends LucidModel>(
     name: string | keyof ModelAttributes<InstanceType<T>>,
     filterClass: Filter<T>,
-    internalName?: keyof ModelAttributes<InstanceType<T>>,
+    internalName?: string | keyof ModelAttributes<InstanceType<T>>,
     arrayValueDelimiter?: string,
   ): AllowedFilter<T> {
     this.setFilterArrayValueDelimiter(arrayValueDelimiter);
@@ -198,7 +198,7 @@ export default class AllowedFilter<Model extends LucidModel> {
   public static operator<T extends LucidModel>(
     name: string | keyof ModelAttributes<InstanceType<T>>,
     filterOperator: EFilterOperator,
-    internalName?: keyof ModelAttributes<InstanceType<T>>,
+    internalName?: string | keyof ModelAttributes<InstanceType<T>>,
     addRelationConstraint = true,
     arrayValueDelimiter?: string,
   ): AllowedFilter<T> {
